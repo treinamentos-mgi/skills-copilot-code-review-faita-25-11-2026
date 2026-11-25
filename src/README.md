@@ -6,6 +6,8 @@ Uma aplicação FastAPI super simples que permite aos alunos visualizar e se ins
 
 - Visualizar todas as atividades extracurriculares disponíveis
 - Inscrever-se em atividades
+- Exibir anúncios dentro do período de validade
+- Gerenciar anúncios com uma sessão autenticada de professor
 
 ## Como começar
 
@@ -27,10 +29,32 @@ Uma aplicação FastAPI super simples que permite aos alunos visualizar e se ins
 
 ## Endpoints da API
 
-| Método | Endpoint                                                          | Descrição                                                            |
-| ------ | ----------------------------------------------------------------- | -------------------------------------------------------------------- |
-| GET    | `/activities`                                                     | Obtém todas as atividades com detalhes e número atual de participantes |
-| POST   | `/activities/{activity_name}/signup?email=student@mergington.edu` | Inscreve-se em uma atividade                                         |
+| Método | Endpoint | Descrição |
+| ------ | -------- | --------- |
+| GET | `/activities` | Obtém atividades; aceita filtros opcionais `day`, `start_time` e `end_time`. |
+| GET | `/activities/days` | Lista os dias com atividades. |
+| POST | `/activities/{activity_name}/signup?email=...&teacher_username=...` | Inscreve um estudante; requer `teacher_username` válido. |
+| POST | `/activities/{activity_name}/unregister?email=...&teacher_username=...` | Remove um estudante; requer `teacher_username` válido. |
+| POST | `/auth/login?username=...&password=...` | Autentica um professor e retorna `session_token`. |
+| GET | `/auth/check-session` | Valida a sessão enviada no cabeçalho Bearer. |
+| POST | `/auth/logout` | Revoga a sessão enviada no cabeçalho Bearer. |
+| GET | `/announcements/active` | Lista anúncios cuja data de início e expiração permitem exibição. |
+| GET | `/announcements/manage` | Lista todos os anúncios; requer sessão autenticada. |
+| POST | `/announcements` | Cria um anúncio; requer sessão autenticada. |
+| PUT | `/announcements/{announcement_id}` | Atualiza um anúncio; requer sessão autenticada. |
+| DELETE | `/announcements/{announcement_id}` | Exclui um anúncio; requer sessão autenticada. |
+
+Envie `session_token` no cabeçalho `Authorization: Bearer <session_token>` para `/auth/check-session`, `/auth/logout` e rotas de gerenciamento de anúncios. As sessões expiram após 12 horas. Cada anúncio possui `message` e `expires_at` obrigatórios e `starts_at` opcional, todos enviados como JSON; as datas usam o formato `YYYY-MM-DD`.
+
+Corpo JSON para criar ou atualizar um anúncio:
+
+```json
+{
+   "message": "Inscrições abertas até sexta-feira.",
+   "starts_at": null,
+   "expires_at": "2026-12-31"
+}
+```
 
 ## Modelo de Dados
 
@@ -42,8 +66,6 @@ A aplicação usa um modelo de dados simples com identificadores significativos:
    - Número máximo de participantes permitidos
    - Lista de e-mails dos alunos inscritos
 
-2. **Alunos** - Usa o e-mail como identificador:
-   - Nome
-   - Série
+2. **Anúncios** - Armazenados no MongoDB com mensagem, data de expiração obrigatória e data de início opcional.
 
-Todos os dados são armazenados em memória, o que significa que serão resetados quando o servidor for reiniciado.
+O banco MongoDB é inicializado com atividades, contas de professores e um anúncio de exemplo quando as respectivas coleções estão vazias.
