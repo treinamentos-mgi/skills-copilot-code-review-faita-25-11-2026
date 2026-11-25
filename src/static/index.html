@@ -12,9 +12,10 @@
     />
   </head>
   <body>
-    <div class="announcement-banner">
-        📢 As inscrições para atividades estão abertas até o final do mês. Não perca sua vaga! Teste
-    </div>    
+    <section id="announcement-banner" class="announcement-banner hidden" role="region" aria-label="Avisos" aria-live="polite">
+      <span class="announcement-banner-icon" aria-hidden="true">📣</span>
+      <div id="announcement-list" class="announcement-list"></div>
+    </section>
     <header>
       <h1>Mergington High School</h1>
       <h2>Atividades Extracurriculares</h2>
@@ -26,6 +27,10 @@
           </button>
           <div id="user-info" class="hidden">
             <span id="display-name"></span>
+            <button id="announcement-manage-button" class="icon-button" type="button">
+              <span aria-hidden="true">📢</span>
+              <span>Anúncios</span>
+            </button>
             <button id="logout-button">Sair</button>
           </div>
         </div>
@@ -100,6 +105,39 @@
     <footer>
       <p>&copy; 2023 Mergington High School</p>
     </footer>
+
+    <div id="announcement-modal" class="modal hidden" role="dialog" aria-modal="true" aria-labelledby="announcement-dialog-title">
+      <div class="modal-content announcement-dialog">
+        <button id="close-announcement-modal" class="close-announcement-modal" type="button" aria-label="Fechar">&times;</button>
+        <div class="announcement-manager-header">
+          <h3 id="announcement-dialog-title">Gerenciar anúncios</h3>
+          <button id="new-announcement-button" class="primary-action" type="button">＋ Novo anúncio</button>
+        </div>
+        <div id="announcement-feedback" class="hidden" role="status" aria-live="polite"></div>
+        <div id="announcements-list" class="announcements-list"></div>
+        <form id="announcement-form" class="announcement-form hidden">
+          <h4 id="announcement-form-title">Novo anúncio</h4>
+          <div class="form-group">
+            <label for="announcement-message">Mensagem</label>
+            <textarea id="announcement-message" rows="3" maxlength="500" required></textarea>
+          </div>
+          <div class="announcement-date-fields">
+            <div class="form-group">
+              <label for="announcement-starts-at">Data de início <span>(opcional)</span></label>
+              <input id="announcement-starts-at" type="date" />
+            </div>
+            <div class="form-group">
+              <label for="announcement-expires-at">Data de expiração</label>
+              <input id="announcement-expires-at" type="date" required />
+            </div>
+          </div>
+          <div class="announcement-form-actions">
+            <button id="cancel-announcement-button" class="secondary-action" type="button">Cancelar</button>
+            <button id="save-announcement-button" class="primary-action" type="submit">Salvar anúncio</button>
+          </div>
+        </form>
+      </div>
+    </div>
 
     <!-- Registration Modal -->
     <div id="registration-modal" class="modal hidden">
